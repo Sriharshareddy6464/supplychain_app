@@ -458,7 +458,7 @@ export const useStore = create<AppState>()(
         return get().orders.filter(order => order.supplierId === supplierId);
       },
 
-      getOrdersByVendor: (vendorId, category) => {
+      getOrdersByVendor: (vendorId) => {
         return get().orders.filter(order =>
           order.items.some(item => item.vendorId === vendorId)
         );
