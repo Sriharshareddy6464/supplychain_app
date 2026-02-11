@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
+import {
   ArrowLeft,
   MapPin,
   User,
@@ -19,9 +19,10 @@ import {
   AlertCircle,
   Clock
 } from 'lucide-react';
-import { CURRENCY, PRODUCT_CATEGORIES } from '@/constants';
-
+import { CURRENCY, PRODUCT_CATEGORIES, CATEGORY_TO_VENDOR_SUBROLE } from '@/constants';
 import { formatDistanceToNow } from '@/lib/utils';
+import { toast } from 'sonner';
+import type { ProductCategory } from '@/types';
 
 interface OrderDetailsProps {
   role: 'kitchen' | 'supplier' | 'vendor' | 'admin';
@@ -30,13 +31,14 @@ interface OrderDetailsProps {
 export function OrderDetails({ role }: OrderDetailsProps) {
   const navigate = useNavigate();
   const { orderId } = useParams();
-  const { 
-    currentUser, 
-    orders, 
+  const {
+    currentUser,
+    orders,
     users,
     updateOrderStatus,
     assignSupplier,
-    createRide 
+    assignVendor,
+    createRide
   } = useStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -78,30 +80,44 @@ export function OrderDetails({ role }: OrderDetailsProps) {
 
   // Get available vendors for each category
   const getVendorsForCategory = (category: string) => {
-    return users.filter(u => 
-      u.role === 'vendor' && 
+    const validSubRoles = CATEGORY_TO_VENDOR_SUBROLE[category as ProductCategory] || [];
+
+    return users.filter(u =>
+      u.role === 'vendor' &&
       u.isActive &&
-      u.subRole?.includes(category === 'fruits' ? 'fruit' : 
-        category === 'vegetables' ? 'veggies' :
-        category === 'meat' ? 'butcher' :
-        category === 'dairy' ? 'dairy' : '')
+      validSubRoles.includes(u.subRole as any) &&
+      (currentUser?.agreements.includes(u.id) || false) // Only vendors with agreement
     );
   };
 
   const handleAcceptOrder = async () => {
     if (!currentUser) return;
     setIsProcessing(true);
-    
+
     try {
       assignSupplier(order.id, currentUser.id, currentUser.name);
+
       // Assign vendors for each category
+      let missingVendors = false;
       Object.keys(itemsByCategory).forEach(category => {
         const vendors = getVendorsForCategory(category);
         if (vendors.length > 0) {
-          // Assign first available vendor - would be implemented in store
-          console.log('Assigning vendor for category:', category);
+          // Auto-assign first available vendor
+          const vendor = vendors[0];
+          assignVendor(order.id, category as ProductCategory, vendor.id, vendor.name);
+          toast.success(`Assigned ${category} to ${vendor.name}`);
+        } else {
+          missingVendors = true;
+          toast.error(`No connected vendor found for ${category}`);
         }
       });
+
+      if (missingVendors) {
+        toast.warning('Some items could not be assigned to vendors. Please check your agreements.');
+      } else {
+        toast.success('Order accepted and vendors assigned');
+      }
+
     } finally {
       setIsProcessing(false);
     }
@@ -112,7 +128,8 @@ export function OrderDetails({ role }: OrderDetailsProps) {
     try {
       updateOrderStatus(order.id, 'packed_ready');
       // Create delivery ride
-      createRide(order.id, order.kitchenAddress, order.kitchenAddress);
+      createRide(order.id, order.kitchenAddress, order.kitchenAddress); // Drop address needs to be real
+      toast.success('Order marked as packed and delivery requested');
     } finally {
       setIsProcessing(false);
     }
@@ -122,6 +139,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
     setIsProcessing(true);
     try {
       updateOrderStatus(order.id, 'completed');
+      toast.success('Order completed successfully');
     } finally {
       setIsProcessing(false);
     }
@@ -132,23 +150,27 @@ export function OrderDetails({ role }: OrderDetailsProps) {
       case 'supplier':
         if (order.status === 'pending_supplier' && !order.supplierId) {
           return (
-            <Button 
+            <Button
               className="w-full"
               size="lg"
               onClick={handleAcceptOrder}
               disabled={isProcessing}
             >
               <CheckCircle className="w-4 h-4 mr-2" />
-              Accept Order
+              Accept & Assign Vendors
             </Button>
           );
         }
         return null;
 
       case 'vendor':
+        // For vendors, we need to see if they are assigned to any item in this order
+        const myItems = order.items.filter(item => item.vendorId === currentUser?.id);
+        if (myItems.length === 0) return null;
+
         if (order.status === 'vendor_assigned') {
           return (
-            <Button 
+            <Button
               className="w-full"
               size="lg"
               onClick={() => updateOrderStatus(order.id, 'packing')}
@@ -161,7 +183,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
         }
         if (order.status === 'packing') {
           return (
-            <Button 
+            <Button
               className="w-full"
               size="lg"
               onClick={handleConfirmPacked}
@@ -177,7 +199,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
       case 'kitchen':
         if (order.status === 'delivered') {
           return (
-            <Button 
+            <Button
               className="w-full"
               size="lg"
               onClick={handleKitchenConfirm}
@@ -198,7 +220,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         <div className="hidden md:block">
           <Sidebar />
@@ -214,8 +236,8 @@ export function OrderDetails({ role }: OrderDetailsProps) {
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 onClick={() => navigate(getBackPath())}
               >
@@ -227,7 +249,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
                   <OrderStatusBadge status={order.status} />
                 </div>
                 <p className="text-gray-600">
-                  Created {formatDistanceToNow(order.createdAt)}
+                  Created {formatDistanceToNow(new Date(order.createdAt))} ago
                 </p>
               </div>
             </div>
@@ -312,8 +334,8 @@ export function OrderDetails({ role }: OrderDetailsProps) {
                     </h4>
                     <div className="space-y-2">
                       {items.map((item) => (
-                        <div 
-                          key={item.id} 
+                        <div
+                          key={item.id}
                           className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                         >
                           <div>
@@ -327,6 +349,12 @@ export function OrderDetails({ role }: OrderDetailsProps) {
                             <p className="text-sm text-gray-600">
                               {CURRENCY}{(item.price * item.quantity).toLocaleString()}
                             </p>
+                            {/* Show vendor assignment status if user is supplier */}
+                            {role === 'supplier' && (
+                              <p className="text-xs text-blue-600 mt-1">
+                                {item.vendorName ? `Assigned to: ${item.vendorName}` : 'Pending assignment'}
+                              </p>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -357,7 +385,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
                       </p>
                     </div>
                   </div>
-                  
+
                   {order.supplierId && (
                     <div className="flex items-start gap-4">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">

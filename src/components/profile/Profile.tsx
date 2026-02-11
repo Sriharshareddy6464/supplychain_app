@@ -9,15 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { 
-  User, 
-  MapPin, 
+import {
+  User,
+  MapPin,
   Edit,
   Save,
   ArrowLeft,
   Lock
 } from 'lucide-react';
 import { USER_ROLES } from '@/constants';
+import { AgreementsSection } from './AgreementsSection';
 
 export function Profile() {
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ export function Profile() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         <div className="hidden md:block">
           <Sidebar />
@@ -84,8 +85,8 @@ export function Profile() {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="icon"
                   onClick={() => navigate(getBackPath())}
                 >
@@ -247,6 +248,9 @@ export function Profile() {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Agreements Section */}
+              <AgreementsSection />
             </div>
           </div>
         </main>

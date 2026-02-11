@@ -1,17 +1,19 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { 
-  User, 
-  Order, 
-  Product, 
-  Invoice, 
-  DeliveryRide, 
-  Notification, 
+import type {
+  User,
+  Order,
+  Product,
+  Invoice,
+  DeliveryRide,
+  Notification,
   SupportTicket,
   OrderItem,
   UserRole,
   ProductCategory,
-  Address 
+  Address,
+  VendorInventoryItem,
+  VerificationDetails
 } from '@/types';
 import { INVENTORY_PRODUCTS, DEMO_USERS } from '@/constants';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,6 +26,10 @@ interface AuthState {
   register: (userData: Partial<User> & { email: string; password: string; name: string; role: UserRole }) => { success: boolean; message: string };
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
+  // New Actions
+  establishAgreement: (targetUserId: string) => { success: boolean; message: string };
+  updateVendorInventory: (inventory: VendorInventoryItem[]) => void;
+  updateVerification: (details: VerificationDetails) => void;
 }
 
 // Order Store
@@ -101,7 +107,7 @@ interface AdminState {
 }
 
 // Combined Store
-interface AppState extends AuthState, OrderState, InventoryState, InvoiceState, DeliveryState, NotificationState, SupportState, AdminState {}
+interface AppState extends AuthState, OrderState, InventoryState, InvoiceState, DeliveryState, NotificationState, SupportState, AdminState { }
 
 // Generate unique order number
 const generateOrderNumber = () => {
@@ -121,10 +127,21 @@ const generateInvoiceNumber = () => {
   return `${prefix}${timestamp}${random}`;
 };
 
+// Generate unique 12-char ID
+const generateUniqueId = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 12; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 // Create initial demo users
 const createDemoUsers = (): User[] => {
   return DEMO_USERS.map((demo, index) => ({
     id: `user-${index}`,
+    uniqueId: generateUniqueId(),
     email: demo.email,
     password: demo.password,
     name: demo.name,
@@ -142,6 +159,8 @@ const createDemoUsers = (): User[] => {
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
+    agreements: [], // Initialize empty agreements
+    inventory: demo.role === 'vendor' ? [] : undefined,
   }));
 };
 
@@ -155,7 +174,7 @@ export const useStore = create<AppState>()(
       login: (email: string, password: string) => {
         const users = get().users;
         const user = users.find(u => u.email === email && u.password === password);
-        
+
         if (user) {
           if (!user.isActive) {
             return { success: false, message: 'Account is deactivated. Contact admin.' };
@@ -168,7 +187,7 @@ export const useStore = create<AppState>()(
 
       register: (userData) => {
         const users = get().users;
-        
+
         if (users.find(u => u.email === userData.email)) {
           return { success: false, message: 'Email already registered' };
         }
@@ -191,6 +210,9 @@ export const useStore = create<AppState>()(
           isActive: true,
           createdAt: new Date(),
           updatedAt: new Date(),
+          uniqueId: generateUniqueId(),
+          agreements: [],
+          inventory: userData.role === 'vendor' ? [] : undefined,
         };
 
         set({ users: [...users, newUser] });
@@ -207,7 +229,60 @@ export const useStore = create<AppState>()(
 
         const updatedUser = { ...currentUser, ...userData, updatedAt: new Date() };
         const updatedUsers = users.map(u => u.id === currentUser.id ? updatedUser : u);
-        
+
+        set({ currentUser: updatedUser, users: updatedUsers });
+      },
+
+      establishAgreement: (targetUserId) => {
+        const { currentUser, users } = get();
+        if (!currentUser) return { success: false, message: 'Not authenticated' };
+
+        const targetUser = users.find(u => u.uniqueId === targetUserId || u.id === targetUserId);
+        if (!targetUser) return { success: false, message: 'User not found' };
+
+        // Check if already connected
+        if (currentUser.agreements.includes(targetUser.id)) {
+          return { success: false, message: 'Agreement already exists' };
+        }
+
+        // Update both users
+        const updatedCurrentUser = {
+          ...currentUser,
+          agreements: [...currentUser.agreements, targetUser.id]
+        };
+
+        const updatedTargetUser = {
+          ...targetUser,
+          agreements: [...targetUser.agreements, currentUser.id]
+        };
+
+        const updatedUsers = users.map(u => {
+          if (u.id === currentUser.id) return updatedCurrentUser;
+          if (u.id === targetUser.id) return updatedTargetUser;
+          return u;
+        });
+
+        set({ currentUser: updatedCurrentUser, users: updatedUsers });
+        return { success: true, message: `Agreement established with ${targetUser.name}` };
+      },
+
+      updateVendorInventory: (inventory) => {
+        const { currentUser, users } = get();
+        if (!currentUser || currentUser.role !== 'vendor') return;
+
+        const updatedUser = { ...currentUser, inventory, updatedAt: new Date() };
+        const updatedUsers = users.map(u => u.id === currentUser.id ? updatedUser : u);
+
+        set({ currentUser: updatedUser, users: updatedUsers });
+      },
+
+      updateVerification: (details) => {
+        const { currentUser, users } = get();
+        if (!currentUser || currentUser.role !== 'transporter') return;
+
+        const updatedUser = { ...currentUser, verificationDetails: details, updatedAt: new Date() };
+        const updatedUsers = users.map(u => u.id === currentUser.id ? updatedUser : u);
+
         set({ currentUser: updatedUser, users: updatedUsers });
       },
 
@@ -230,14 +305,26 @@ export const useStore = create<AppState>()(
           notes,
         };
 
-        set(state => ({ 
+        set(state => ({
           orders: [...state.orders, newOrder],
-          currentOrder: newOrder 
+          currentOrder: newOrder
         }));
 
-        // Notify suppliers
+        // Notify suppliers (ONLY those with agreements)
+        const kitchenUser = get().users.find(u => u.id === kitchenId);
         const suppliers = get().users.filter(u => u.role === 'supplier');
-        suppliers.forEach(supplier => {
+
+        // Filter suppliers who have an agreement with this kitchen
+        const relevantSuppliers = suppliers.filter(supplier =>
+          kitchenUser?.agreements.includes(supplier.id) ||
+          supplier.agreements.includes(kitchenId) // Check bidirectional just in case
+        );
+
+        // Fallback: If no agreements, maybe notify all? No, user requested logic change.
+        // But for development/demo safety if no agreements exist yet, we might want a warning.
+        // For now, implementing strict logic as requested.
+
+        relevantSuppliers.forEach(supplier => {
           get().addNotification(
             supplier.id,
             'New Order Available',
@@ -251,8 +338,8 @@ export const useStore = create<AppState>()(
 
       updateOrderStatus: (orderId, status) => {
         set(state => ({
-          orders: state.orders.map(order => 
-            order.id === orderId 
+          orders: state.orders.map(order =>
+            order.id === orderId
               ? { ...order, status, updatedAt: new Date() }
               : order
           )
@@ -261,9 +348,9 @@ export const useStore = create<AppState>()(
         const order = get().orders.find(o => o.id === orderId);
         if (order) {
           // Send notifications based on status
-          let notification: { title: string; message: string; type: Notification['type'] } = 
+          let notification: { title: string; message: string; type: Notification['type'] } =
             { title: '', message: '', type: 'info' };
-          
+
           switch (status) {
             case 'vendor_assigned':
               notification = {
@@ -316,8 +403,8 @@ export const useStore = create<AppState>()(
 
       assignSupplier: (orderId, supplierId, supplierName) => {
         set(state => ({
-          orders: state.orders.map(order => 
-            order.id === orderId 
+          orders: state.orders.map(order =>
+            order.id === orderId
               ? { ...order, supplierId, supplierName, status: 'vendor_assigned', updatedAt: new Date() }
               : order
           )
@@ -326,17 +413,17 @@ export const useStore = create<AppState>()(
 
       assignVendor: (orderId, category, vendorId, vendorName) => {
         set(state => ({
-          orders: state.orders.map(order => 
-            order.id === orderId 
-              ? { 
-                  ...order, 
-                  items: order.items.map(item => 
-                    item.category === category 
-                      ? { ...item, vendorId, vendorName }
-                      : item
-                  ),
-                  updatedAt: new Date()
-                }
+          orders: state.orders.map(order =>
+            order.id === orderId
+              ? {
+                ...order,
+                items: order.items.map(item =>
+                  item.category === category
+                    ? { ...item, vendorId, vendorName }
+                    : item
+                ),
+                updatedAt: new Date()
+              }
               : order
           )
         }));
@@ -355,8 +442,8 @@ export const useStore = create<AppState>()(
 
       assignTransporter: (orderId, transporterId, transporterName) => {
         set(state => ({
-          orders: state.orders.map(order => 
-            order.id === orderId 
+          orders: state.orders.map(order =>
+            order.id === orderId
               ? { ...order, transporterId, transporterName, updatedAt: new Date() }
               : order
           )
@@ -372,8 +459,8 @@ export const useStore = create<AppState>()(
       },
 
       getOrdersByVendor: (vendorId, category) => {
-        return get().orders.filter(order => 
-          order.items.some(item => item.vendorId === vendorId && item.category === category)
+        return get().orders.filter(order =>
+          order.items.some(item => item.vendorId === vendorId)
         );
       },
 
@@ -503,8 +590,8 @@ export const useStore = create<AppState>()(
 
       acceptRide: (rideId, transporterId, transporterName) => {
         set(state => ({
-          rides: state.rides.map(ride => 
-            ride.id === rideId 
+          rides: state.rides.map(ride =>
+            ride.id === rideId
               ? { ...ride, transporterId, transporterName, status: 'accepted', acceptedAt: new Date() }
               : ride
           )
@@ -537,8 +624,8 @@ export const useStore = create<AppState>()(
 
       updateLocation: (rideId, lat, lng) => {
         set(state => ({
-          rides: state.rides.map(ride => 
-            ride.id === rideId 
+          rides: state.rides.map(ride =>
+            ride.id === rideId
               ? { ...ride, coordinates: { lat, lng } }
               : ride
           )
@@ -572,8 +659,8 @@ export const useStore = create<AppState>()(
 
       markAsRead: (notificationId) => {
         set(state => ({
-          notifications: state.notifications.map(notif => 
-            notif.id === notificationId 
+          notifications: state.notifications.map(notif =>
+            notif.id === notificationId
               ? { ...notif, isRead: true }
               : notif
           )
@@ -582,8 +669,8 @@ export const useStore = create<AppState>()(
 
       markAllAsRead: (userId) => {
         set(state => ({
-          notifications: state.notifications.map(notif => 
-            notif.userId === userId 
+          notifications: state.notifications.map(notif =>
+            notif.userId === userId
               ? { ...notif, isRead: true }
               : notif
           )
@@ -632,14 +719,14 @@ export const useStore = create<AppState>()(
         };
 
         set(state => ({
-          tickets: state.tickets.map(ticket => 
-            ticket.id === ticketId 
-              ? { 
-                  ...ticket, 
-                  responses: [...ticket.responses, newResponse],
-                  updatedAt: new Date(),
-                  status: ticket.status === 'open' ? 'in_progress' : ticket.status
-                }
+          tickets: state.tickets.map(ticket =>
+            ticket.id === ticketId
+              ? {
+                ...ticket,
+                responses: [...ticket.responses, newResponse],
+                updatedAt: new Date(),
+                status: ticket.status === 'open' ? 'in_progress' : ticket.status
+              }
               : ticket
           )
         }));
@@ -647,8 +734,8 @@ export const useStore = create<AppState>()(
 
       updateTicketStatus: (ticketId, status) => {
         set(state => ({
-          tickets: state.tickets.map(ticket => 
-            ticket.id === ticketId 
+          tickets: state.tickets.map(ticket =>
+            ticket.id === ticketId
               ? { ...ticket, status, updatedAt: new Date() }
               : ticket
           )
@@ -694,7 +781,7 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'supplychain-storage',
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         users: state.users,
         orders: state.orders,
         invoices: state.invoices,

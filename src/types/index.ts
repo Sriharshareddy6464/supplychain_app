@@ -1,21 +1,21 @@
 // User Roles and Sub-roles
 export type UserRole = 'admin' | 'kitchen' | 'supplier' | 'vendor' | 'transporter';
 
-export type SubRole = 
-  | 'chef' 
+export type SubRole =
+  | 'chef'
   | 'restaurant_manager'
-  | 'veggies_vendor' 
-  | 'fruit_vendor' 
-  | 'butcher' 
-  | 'dairy_vendor' 
-  | 'driver' 
+  | 'veggies_vendor'
+  | 'fruit_vendor'
+  | 'butcher'
+  | 'dairy_vendor'
+  | 'driver'
   | 'delivery_agent';
 
 // Product Categories
 export type ProductCategory = 'fruits' | 'vegetables' | 'meat' | 'dairy' | 'grains' | 'spices';
 
 // Order Status
-export type OrderStatus = 
+export type OrderStatus =
   | 'draft'
   | 'pending_supplier'
   | 'vendor_assigned'
@@ -42,6 +42,11 @@ export interface User {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  // New Fields
+  uniqueId: string; // 12-char unique ID
+  agreements: string[]; // List of user IDs with whom agreement is established
+  inventory?: VendorInventoryItem[]; // For vendors
+  verificationDetails?: VerificationDetails; // For delivery agents
 }
 
 // Address Interface
@@ -67,6 +72,30 @@ export interface Product {
   description?: string;
   imageUrl?: string;
   isActive: boolean;
+}
+
+// Vendor Inventory Item
+export interface VendorInventoryItem {
+  id: string;
+  name: string;
+  category: ProductCategory;
+  price: number;
+  inStock: boolean;
+  minOrderQuantity?: number;
+}
+
+// Verification Details
+export interface VerificationDetails {
+  aadhaarNumber: string;
+  aadhaarImage?: string;
+  licenseNumber: string;
+  licenseImage?: string;
+  licenseExpiry: Date;
+  rcNumber?: string; // Vehicle Registration
+  rcImage?: string;
+  rcExpiry?: Date;
+  status: 'pending' | 'verified' | 'rejected';
+  rejectionReason?: string;
 }
 
 // Order Item Interface

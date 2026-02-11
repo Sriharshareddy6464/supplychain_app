@@ -10,10 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ShoppingCart, 
-  Package, 
-  Clock, 
+import {
+  ShoppingCart,
+  Package,
+  Clock,
   CheckCircle,
   Eye,
   TrendingUp,
@@ -29,7 +29,11 @@ export function SupplierDashboard() {
 
   // Get all orders that need supplier assignment or are assigned to this supplier
   const assignedOrders = orders.filter(o => o.supplierId === currentUser?.id);
-  const pendingOrders = orders.filter(o => !o.supplierId && o.status === 'pending_supplier');
+  const pendingOrders = orders.filter(o =>
+    !o.supplierId &&
+    o.status === 'pending_supplier' &&
+    (currentUser?.agreements.includes(o.kitchenId) || false)
+  );
   const todaysOrders = orders.filter(o => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -41,17 +45,17 @@ export function SupplierDashboard() {
   const weeklyStats = currentUser ? getWeeklyStats(currentUser.id) : { total: 0, count: 0 };
   const monthlyStats = currentUser ? getMonthlyStats(currentUser.id) : { total: 0, count: 0 };
 
-  const activeOrders = assignedOrders.filter(o => 
+  const activeOrders = assignedOrders.filter(o =>
     ['vendor_assigned', 'packing', 'packed_ready', 'pickup_requested', 'in_transit'].includes(o.status)
   );
-  const completedOrders = assignedOrders.filter(o => 
+  const completedOrders = assignedOrders.filter(o =>
     ['kitchen_confirmed', 'completed'].includes(o.status)
   );
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         {/* Desktop Sidebar */}
         <div className="hidden md:block">
@@ -187,8 +191,8 @@ export function SupplierDashboard() {
                   ) : (
                     <div className="space-y-4">
                       {pendingOrders.slice(0, 5).map((order) => (
-                        <div 
-                          key={order.id} 
+                        <div
+                          key={order.id}
                           className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
                           onClick={() => navigate(`/supplier/orders/${order.id}`)}
                         >
@@ -228,8 +232,8 @@ export function SupplierDashboard() {
                   ) : (
                     <div className="space-y-4">
                       {activeOrders.slice(0, 5).map((order) => (
-                        <div 
-                          key={order.id} 
+                        <div
+                          key={order.id}
                           className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
                           onClick={() => navigate(`/supplier/orders/${order.id}`)}
                         >
