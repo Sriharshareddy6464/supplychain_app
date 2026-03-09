@@ -96,7 +96,7 @@ export function Register() {
     setIsLoading(true);
 
     try {
-      const result = register({
+      const result = await register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -170,9 +170,8 @@ export function Register() {
                 {[1, 2, 3].map((s) => (
                   <div
                     key={s}
-                    className={`w-8 h-1 rounded-full ${
-                      s === step ? 'bg-blue-600' : s < step ? 'bg-blue-300' : 'bg-gray-200'
-                    }`}
+                    className={`w-8 h-1 rounded-full ${s === step ? 'bg-blue-600' : s < step ? 'bg-blue-300' : 'bg-gray-200'
+                      }`}
                   />
                 ))}
               </div>

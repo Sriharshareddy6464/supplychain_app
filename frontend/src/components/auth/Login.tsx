@@ -23,11 +23,11 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const result = login(email, password);
-      
+      const result = await login(email, password);
+
       if (result.success) {
         const { currentUser } = useStore.getState();
-        
+
         // Redirect based on role
         switch (currentUser?.role) {
           case 'admin':
@@ -155,20 +155,20 @@ export function Login() {
               <p className="text-xs text-gray-500 text-center mb-2">Demo Credentials</p>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
                 <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">admin@supplychain.com</span>
-                  <br />admin123
-                </div>
-                <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">kitchen@supplychain.com</span>
-                  <br />kitchen123
-                </div>
-                <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">supplier@supplychain.com</span>
+                  <span className="font-medium">supplier@aggregator.com</span>
                   <br />supplier123
                 </div>
                 <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">vendor@supplychain.com</span>
+                  <span className="font-medium">headchef@cloudkitchen.com</span>
+                  <br />chef123
+                </div>
+                <div className="bg-white p-2 rounded border">
+                  <span className="font-medium">kuragailaraju@vendor.com</span>
                   <br />vendor123
+                </div>
+                <div className="bg-white p-2 rounded border">
+                  <span className="font-medium">driver@logistics.com</span>
+                  <br />driver123
                 </div>
               </div>
             </div>
