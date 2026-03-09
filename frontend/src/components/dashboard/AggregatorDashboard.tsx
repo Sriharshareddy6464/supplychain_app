@@ -22,19 +22,19 @@ import {
 import { CURRENCY } from '@/constants';
 import { formatDistanceToNow } from '@/lib/utils';
 
-export function SupplierDashboard() {
+export function AggregatorDashboard() {
   const navigate = useNavigate();
   const { currentUser, orders, getWeeklyStats, getMonthlyStats } = useStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Get all orders that need supplier assignment or are assigned to this supplier
-  const assignedOrders = orders.filter(o => o.supplierId === currentUser?.id);
-  const pendingOrders = orders.filter(o =>
+  const assignedOrders = orders.filter((o: any) => o.supplierId === currentUser?.id);
+  const pendingOrders = orders.filter((o: any) =>
     !o.supplierId &&
     o.status === 'pending_supplier' &&
     (currentUser?.agreements.includes(o.kitchenId) || false)
   );
-  const todaysOrders = orders.filter(o => {
+  const todaysOrders = orders.filter((o: any) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const orderDate = new Date(o.createdAt);
@@ -45,10 +45,10 @@ export function SupplierDashboard() {
   const weeklyStats = currentUser ? getWeeklyStats(currentUser.id) : { total: 0, count: 0 };
   const monthlyStats = currentUser ? getMonthlyStats(currentUser.id) : { total: 0, count: 0 };
 
-  const activeOrders = assignedOrders.filter(o =>
+  const activeOrders = assignedOrders.filter((o: any) =>
     ['vendor_assigned', 'packing', 'packed_ready', 'pickup_requested', 'in_transit'].includes(o.status)
   );
-  const completedOrders = assignedOrders.filter(o =>
+  const completedOrders = assignedOrders.filter((o: any) =>
     ['kitchen_confirmed', 'completed'].includes(o.status)
   );
 
@@ -144,7 +144,7 @@ export function SupplierDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {todaysOrders.map((order) => (
+                        {todaysOrders.map((order: any) => (
                           <tr key={order.id} className="border-b hover:bg-gray-50">
                             <td className="py-3 px-4 font-medium">{order.orderNumber}</td>
                             <td className="py-3 px-4">{order.kitchenName}</td>
@@ -157,7 +157,7 @@ export function SupplierDashboard() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => navigate(`/supplier/orders/${order.id}`)}
+                                onClick={() => navigate(`/aggregator/orders/${order.id}`)}
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
@@ -190,7 +190,7 @@ export function SupplierDashboard() {
                     />
                   ) : (
                     <div className="space-y-4">
-                      {pendingOrders.slice(0, 5).map((order) => (
+                      {pendingOrders.slice(0, 5).map((order: any) => (
                         <div
                           key={order.id}
                           className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
@@ -231,11 +231,11 @@ export function SupplierDashboard() {
                     />
                   ) : (
                     <div className="space-y-4">
-                      {activeOrders.slice(0, 5).map((order) => (
+                      {activeOrders.slice(0, 5).map((order: any) => (
                         <div
                           key={order.id}
                           className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
-                          onClick={() => navigate(`/supplier/orders/${order.id}`)}
+                          onClick={() => navigate(`/aggregator/orders/${order.id}`)}
                         >
                           <div>
                             <p className="font-medium">{order.orderNumber}</p>

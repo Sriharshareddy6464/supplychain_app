@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store';
 import { Button } from '@/components/ui/button';
-import { 
-  Truck, 
-  Bell, 
-  User, 
-  LogOut, 
+import {
+  Truck,
+  Bell,
+  User,
+  LogOut,
   Menu,
-  ChevronDown 
+  ChevronDown
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -36,11 +36,11 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const getRoleLabel = () => {
     switch (currentUser?.role) {
-      case 'admin': return 'Administrator';
+      case 'admin': return 'System Admin';
+      case 'aggregator': return 'Aggregator';
       case 'kitchen': return 'Kitchen';
-      case 'supplier': return 'Supplier';
       case 'vendor': return 'Vendor';
-      case 'transporter': return 'Transporter';
+      case 'driver': return 'Driver';
       default: return '';
     }
   };
@@ -76,8 +76,8 @@ export function Header({ onMenuClick }: HeaderProps) {
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
+                  <Badge
+                    variant="destructive"
                     className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
                   >
                     {unreadCount}

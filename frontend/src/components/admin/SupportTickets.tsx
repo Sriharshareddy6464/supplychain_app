@@ -12,8 +12,8 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  HeadphonesIcon, 
+import {
+  HeadphonesIcon,
   Search,
   ArrowLeft,
   MessageSquare,
@@ -33,15 +33,15 @@ export function SupportTickets() {
   const [showTicketDialog, setShowTicketDialog] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
 
-  const filteredTickets = tickets.filter(ticket => {
-    const matchesSearch = 
+  const filteredTickets = tickets.filter((ticket: any) => {
+    const matchesSearch =
       ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ticket.userName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const openTickets = filteredTickets.filter(t => ['open', 'in_progress'].includes(t.status));
+  const openTickets = filteredTickets.filter((t: any) => ['open', 'in_progress'].includes(t.status));
 
   const openTicketDialog = (ticket: typeof tickets[0]) => {
     setSelectedTicket(ticket);
@@ -53,7 +53,7 @@ export function SupportTickets() {
 
   const handleSendResponse = () => {
     if (!selectedTicket || !responseMessage.trim()) return;
-    
+
     addResponse(selectedTicket.id, 'admin', 'Support Team', responseMessage);
     setResponseMessage('');
   };
@@ -76,7 +76,7 @@ export function SupportTickets() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         <div className="hidden md:block">
           <Sidebar />
@@ -93,8 +93,8 @@ export function SupportTickets() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="icon"
                   onClick={() => navigate('/admin')}
                 >
@@ -164,9 +164,9 @@ export function SupportTickets() {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {filteredTickets.sort((a, b) => 
-                          b.createdAt.getTime() - a.createdAt.getTime()
-                        ).map((ticket) => (
+                        {filteredTickets.sort((a: any, b: any) =>
+                          b.updatedAt.getTime() - a.updatedAt.getTime()
+                        ).map((ticket: any) => (
                           <tr key={ticket.id} className="hover:bg-gray-50 transition-colors">
                             <td className="py-4 px-4">
                               <div>
@@ -185,9 +185,9 @@ export function SupportTickets() {
                               </Badge>
                             </td>
                             <td className="py-4 px-4">
-                              <Badge 
-                                variant={ticket.status === 'open' ? 'destructive' : 
-                                         ticket.status === 'in_progress' ? 'default' : 'secondary'}
+                              <Badge
+                                variant={ticket.status === 'open' ? 'destructive' :
+                                  ticket.status === 'in_progress' ? 'default' : 'secondary'}
                               >
                                 {ticket.status.replace('_', ' ')}
                               </Badge>
@@ -198,8 +198,8 @@ export function SupportTickets() {
                               </p>
                             </td>
                             <td className="py-4 px-4 text-right">
-                              <Button 
-                                variant="ghost" 
+                              <Button
+                                variant="ghost"
                                 size="sm"
                                 onClick={() => openTicketDialog(ticket)}
                               >
@@ -228,16 +228,16 @@ export function SupportTickets() {
               Ticket from {selectedTicket?.userName}
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedTicket && (
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <Badge className={getPriorityColor(selectedTicket.priority)}>
                   {selectedTicket.priority} priority
                 </Badge>
-                <Badge 
-                  variant={selectedTicket.status === 'open' ? 'destructive' : 
-                           selectedTicket.status === 'in_progress' ? 'default' : 'secondary'}
+                <Badge
+                  variant={selectedTicket.status === 'open' ? 'destructive' :
+                    selectedTicket.status === 'in_progress' ? 'default' : 'secondary'}
                 >
                   {selectedTicket.status.replace('_', ' ')}
                 </Badge>
@@ -261,7 +261,7 @@ export function SupportTickets() {
                 </div>
 
                 {/* Responses */}
-                {selectedTicket.responses.map((response) => (
+                {selectedTicket.responses.map((response: any) => (
                   <div key={response.id} className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -289,7 +289,7 @@ export function SupportTickets() {
                     className="min-h-[100px]"
                   />
                   <div className="flex gap-2">
-                    <Button 
+                    <Button
                       className="flex-1"
                       onClick={handleSendResponse}
                       disabled={!responseMessage.trim()}
@@ -297,7 +297,7 @@ export function SupportTickets() {
                       <Send className="w-4 h-4 mr-2" />
                       Send Response
                     </Button>
-                    <Button 
+                    <Button
                       variant="outline"
                       onClick={handleCloseTicket}
                     >

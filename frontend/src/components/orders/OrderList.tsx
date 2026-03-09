@@ -11,8 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ShoppingCart, 
+import {
+  ShoppingCart,
   Search,
   Eye,
   Filter,
@@ -24,12 +24,12 @@ import type { OrderStatus } from '@/types';
 import { formatDistanceToNow } from '@/lib/utils';
 
 interface OrderListProps {
-  role: 'kitchen' | 'supplier' | 'vendor' | 'admin';
+  role: 'kitchen' | 'aggregator' | 'vendor' | 'admin';
 }
 
 export function OrderList({ role }: OrderListProps) {
   const navigate = useNavigate();
-  const { currentUser, orders, getOrdersByKitchen, getOrdersBySupplier, getOrdersByVendor } = useStore();
+  const { currentUser, orders, getOrdersByVendor } = useStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
@@ -38,15 +38,15 @@ export function OrderList({ role }: OrderListProps) {
   const getOrders = () => {
     switch (role) {
       case 'kitchen':
-        return currentUser ? getOrdersByKitchen(currentUser.id) : [];
-      case 'supplier':
-        return currentUser ? getOrdersBySupplier(currentUser.id) : [];
+        return orders.filter((o: any) => o.kitchenId === currentUser?.id);
+      case 'aggregator':
+        return orders.filter((o: any) => o.supplierId === currentUser?.id || !o.supplierId);
       case 'vendor':
-        return currentUser && currentUser.subRole 
-          ? getOrdersByVendor(currentUser.id, currentUser.subRole.includes('fruit') ? 'fruits' : 
-              currentUser.subRole.includes('veggies') ? 'vegetables' :
+        return currentUser && currentUser.subRole
+          ? getOrdersByVendor(currentUser.id, currentUser.subRole.includes('fruit') ? 'fruits' :
+            currentUser.subRole.includes('veggies') ? 'vegetables' :
               currentUser.subRole.includes('butcher') ? 'meat' :
-              currentUser.subRole.includes('dairy') ? 'dairy' : 'fruits')
+                currentUser.subRole.includes('dairy') ? 'dairy' : 'fruits')
           : [];
       case 'admin':
         return orders;
@@ -58,23 +58,22 @@ export function OrderList({ role }: OrderListProps) {
   const userOrders = getOrders();
 
   // Filter orders
-  const filteredOrders = userOrders.filter(order => {
-    const matchesSearch = 
-      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredOrders = userOrders.filter((order: any) => {
+    const matchesSearch = order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.kitchenName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   // Sort by date (newest first)
-  const sortedOrders = [...filteredOrders].sort((a, b) => 
+  const sortedOrders = [...filteredOrders].sort((a, b) =>
     b.createdAt.getTime() - a.createdAt.getTime()
   );
 
   const getBackPath = () => {
     switch (role) {
       case 'kitchen': return '/kitchen';
-      case 'supplier': return '/supplier';
+      case 'aggregator': return '/aggregator';
       case 'vendor': return '/vendor';
       case 'admin': return '/admin';
       default: return '/';
@@ -84,7 +83,7 @@ export function OrderList({ role }: OrderListProps) {
   const getDetailPath = (orderId: string) => {
     switch (role) {
       case 'kitchen': return `/kitchen/orders/${orderId}`;
-      case 'supplier': return `/supplier/orders/${orderId}`;
+      case 'aggregator': return `/aggregator/orders/${orderId}`;
       case 'vendor': return `/vendor/orders/${orderId}`;
       case 'admin': return `/admin/orders/${orderId}`;
       default: return `/orders/${orderId}`;
@@ -94,7 +93,7 @@ export function OrderList({ role }: OrderListProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         <div className="hidden md:block">
           <Sidebar />
@@ -111,8 +110,8 @@ export function OrderList({ role }: OrderListProps) {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="icon"
                   onClick={() => navigate(getBackPath())}
                 >
@@ -126,7 +125,7 @@ export function OrderList({ role }: OrderListProps) {
                 </div>
               </div>
               {role === 'kitchen' && (
-                <Button 
+                <Button
                   onClick={() => navigate('/kitchen/new-order')}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
@@ -174,8 +173,8 @@ export function OrderList({ role }: OrderListProps) {
                   <EmptyState
                     icon={ShoppingCart}
                     title="No orders found"
-                    description={searchQuery || statusFilter !== 'all' 
-                      ? "Try adjusting your filters" 
+                    description={searchQuery || statusFilter !== 'all'
+                      ? "Try adjusting your filters"
                       : "Your orders will appear here"}
                     actionLabel={role === 'kitchen' ? "Create Order" : undefined}
                     onAction={role === 'kitchen' ? () => navigate('/kitchen/new-order') : undefined}

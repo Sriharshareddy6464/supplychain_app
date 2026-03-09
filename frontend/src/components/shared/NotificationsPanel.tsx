@@ -1,19 +1,19 @@
 import { useStore } from '@/store';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { 
-  Bell, 
-  Check, 
-  Info, 
-  AlertTriangle, 
-  AlertCircle, 
-  CheckCircle 
+import {
+  Bell,
+  Check,
+  Info,
+  AlertTriangle,
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 import { formatDistanceToNow } from '@/lib/utils';
 
 export function NotificationsPanel() {
   const { currentUser, getNotificationsByUser, markAsRead, markAllAsRead } = useStore();
-  
+
   const notifications = currentUser ? getNotificationsByUser(currentUser.id) : [];
 
   const getIcon = (type: string) => {
@@ -31,14 +31,14 @@ export function NotificationsPanel() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-2">
-          <Bell className="w-5 h-5" />
-          <h2 className="font-semibold">Notifications</h2>
-        </div>
-        {notifications.some(n => !n.isRead) && currentUser && (
-          <Button 
-            variant="ghost" 
+      <div className="p-4 bg-gray-50 border-b flex justify-between items-center">
+        <h3 className="font-semibold flex items-center gap-2">
+          <Bell className="w-4 h-4" />
+          Notifications
+        </h3>
+        {notifications.some((n: any) => !n.isRead) && currentUser && (
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => markAllAsRead(currentUser.id)}
           >
@@ -50,18 +50,16 @@ export function NotificationsPanel() {
 
       <ScrollArea className="flex-1">
         {notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-            <Bell className="w-12 h-12 mb-4 opacity-30" />
-            <p>No notifications yet</p>
+          <div className="p-8 text-center text-gray-500">
+            No notifications
           </div>
         ) : (
           <div className="divide-y">
-            {notifications.map((notification) => (
+            {notifications.map((notification: any) => (
               <div
                 key={notification.id}
-                className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
-                  !notification.isRead ? 'bg-blue-50/50' : ''
-                }`}
+                className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${!notification.isRead ? 'bg-blue-50/50' : ''
+                  }`}
                 onClick={() => markAsRead(notification.id)}
               >
                 <div className="flex gap-3">

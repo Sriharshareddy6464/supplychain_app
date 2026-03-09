@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TransporterDashboard } from '../TransporterDashboard';
-// Mock store
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { DriverDashboard } from '../DriverDashboard';
+
+// Mock the store
 const mockUpdateVerification = vi.fn();
 const mockUseStore = vi.fn();
 vi.mock('@/store', () => ({
@@ -11,7 +12,7 @@ vi.mock('@/store', () => ({
 // Mock router
 import { MemoryRouter } from 'react-router-dom';
 
-describe('TransporterDashboard - Verification Flow', () => {
+describe('DriverDashboard - Verification Flow', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -33,7 +34,7 @@ describe('TransporterDashboard - Verification Flow', () => {
 
         render(
             <MemoryRouter>
-                <TransporterDashboard />
+                <DriverDashboard />
             </MemoryRouter>
         );
 
@@ -58,7 +59,7 @@ describe('TransporterDashboard - Verification Flow', () => {
 
         render(
             <MemoryRouter>
-                <TransporterDashboard />
+                <DriverDashboard />
             </MemoryRouter>
         );
 
@@ -92,7 +93,7 @@ describe('TransporterDashboard - Verification Flow', () => {
 
         render(
             <MemoryRouter>
-                <TransporterDashboard />
+                <DriverDashboard />
             </MemoryRouter>
         );
 
@@ -114,7 +115,7 @@ describe('TransporterDashboard - Verification Flow', () => {
 
         render(
             <MemoryRouter>
-                <TransporterDashboard />
+                <DriverDashboard />
             </MemoryRouter>
         );
 

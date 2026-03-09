@@ -25,7 +25,7 @@ import { toast } from 'sonner';
 import type { ProductCategory } from '@/types';
 
 interface OrderDetailsProps {
-  role: 'kitchen' | 'supplier' | 'vendor' | 'admin';
+  role: 'kitchen' | 'aggregator' | 'vendor' | 'admin';
 }
 
 export function OrderDetails({ role }: OrderDetailsProps) {
@@ -43,7 +43,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const order = orders.find(o => o.id === orderId);
+  const order = orders.find((o: any) => o.id === orderId);
 
   if (!order) {
     return (
@@ -64,7 +64,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
   const getBackPath = () => {
     switch (role) {
       case 'kitchen': return '/kitchen/orders';
-      case 'supplier': return '/supplier/orders';
+      case 'aggregator': return '/aggregator/orders';
       case 'vendor': return '/vendor/orders';
       case 'admin': return '/admin/orders';
       default: return '/';
@@ -72,7 +72,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
   };
 
   // Group items by category
-  const itemsByCategory = order.items.reduce((acc, item) => {
+  const itemsByCategory = order.items.reduce((acc: any, item: any) => {
     if (!acc[item.category]) acc[item.category] = [];
     acc[item.category].push(item);
     return acc;
@@ -82,7 +82,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
   const getVendorsForCategory = (category: string) => {
     const validSubRoles = CATEGORY_TO_VENDOR_SUBROLE[category as ProductCategory] || [];
 
-    return users.filter(u =>
+    return users.filter((u: any) =>
       u.role === 'vendor' &&
       u.isActive &&
       validSubRoles.includes(u.subRole as any) &&
@@ -147,7 +147,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
 
   const renderActionButtons = () => {
     switch (role) {
-      case 'supplier':
+      case 'aggregator':
         if (order.status === 'pending_supplier' && !order.supplierId) {
           return (
             <Button
@@ -165,7 +165,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
 
       case 'vendor':
         // For vendors, we need to see if they are assigned to any item in this order
-        const myItems = order.items.filter(item => item.vendorId === currentUser?.id);
+        const myItems = order.items.filter((item: any) => item.vendorId === currentUser?.id);
         if (myItems.length === 0) return null;
 
         if (order.status === 'vendor_assigned') {
@@ -324,7 +324,7 @@ export function OrderDetails({ role }: OrderDetailsProps) {
                 <CardTitle>Order Items</CardTitle>
               </CardHeader>
               <CardContent>
-                {Object.entries(itemsByCategory).map(([category, items]) => (
+                {Object.entries(itemsByCategory).map(([category, items]: [string, any]) => (
                   <div key={category} className="mb-6 last:mb-0">
                     <h4 className="text-sm font-medium text-gray-600 mb-3 capitalize flex items-center gap-2">
                       <Badge variant="secondary">
@@ -332,12 +332,9 @@ export function OrderDetails({ role }: OrderDetailsProps) {
                       </Badge>
                       {items.length} items
                     </h4>
-                    <div className="space-y-2">
-                      {items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                        >
+                    <div className="space-y-4">
+                      {items.map((item: any) => (
+                        <div key={item.id} className="flex justify-between items-center py-2 border-b last:border-0">
                           <div>
                             <p className="font-medium">{item.productName}</p>
                             <p className="text-sm text-gray-500">
@@ -349,9 +346,9 @@ export function OrderDetails({ role }: OrderDetailsProps) {
                             <p className="text-sm text-gray-600">
                               {CURRENCY}{(item.price * item.quantity).toLocaleString()}
                             </p>
-                            {/* Show vendor assignment status if user is supplier */}
-                            {role === 'supplier' && (
-                              <p className="text-xs text-blue-600 mt-1">
+                            {/* Show vendor assignment status if user is aggregator */}
+                            {role === 'aggregator' && (
+                              <p className="mt-2 text-sm text-gray-500">
                                 {item.vendorName ? `Assigned to: ${item.vendorName}` : 'Pending assignment'}
                               </p>
                             )}

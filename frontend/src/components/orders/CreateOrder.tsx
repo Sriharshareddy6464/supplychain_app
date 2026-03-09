@@ -12,10 +12,10 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Plus, 
-  Minus, 
-  ShoppingCart, 
+import {
+  Plus,
+  Minus,
+  ShoppingCart,
   Search,
   Upload,
   FileText,
@@ -40,7 +40,7 @@ export function CreateOrder() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Filter products
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product: any) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory && product.isActive;
@@ -57,8 +57,8 @@ export function CreateOrder() {
     setCart(prev => {
       const existing = prev.find(item => item.productId === product.id);
       if (existing) {
-        return prev.map(item => 
-          item.productId === product.id 
+        return prev.map(item =>
+          item.productId === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -96,7 +96,7 @@ export function CreateOrder() {
     if (!currentUser || cart.length === 0) return;
 
     setIsSubmitting(true);
-    
+
     try {
       createOrder(
         currentUser.id,
@@ -107,7 +107,7 @@ export function CreateOrder() {
       );
 
       setShowConfirmation(true);
-      
+
       setTimeout(() => {
         navigate('/kitchen/orders');
       }, 2000);
@@ -143,7 +143,7 @@ export function CreateOrder() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         <div className="hidden md:block">
           <Sidebar />
@@ -159,8 +159,8 @@ export function CreateOrder() {
           <div className="max-w-7xl mx-auto">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 onClick={() => navigate('/kitchen')}
               >
@@ -220,7 +220,7 @@ export function CreateOrder() {
 
                     {/* Products Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredProducts.map((product) => (
+                      {filteredProducts.map((product: any) => (
                         <Card key={product.id} className="hover:shadow-lg transition-shadow">
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start mb-2">
@@ -233,8 +233,8 @@ export function CreateOrder() {
                             </div>
                             <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
                             <p className="text-sm text-gray-500 mb-3">{product.description}</p>
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               className="w-full"
                               onClick={() => addToCart(product)}
                             >
@@ -276,8 +276,8 @@ export function CreateOrder() {
                                   </h4>
                                   <div className="space-y-2">
                                     {items.map((item) => (
-                                      <div 
-                                        key={item.id} 
+                                      <div
+                                        key={item.id}
                                         className="flex items-center justify-between p-2 bg-gray-50 rounded"
                                       >
                                         <div className="flex-1 min-w-0">
@@ -347,7 +347,7 @@ export function CreateOrder() {
                               />
                             </div>
 
-                            <Button 
+                            <Button
                               className="w-full"
                               size="lg"
                               onClick={handleSubmit}
@@ -375,13 +375,13 @@ export function CreateOrder() {
                         Upload an invoice image or PDF and we'll automatically extract the items for your order.
                       </p>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-500 transition-colors cursor-pointer">
-                        <Input 
-                          type="file" 
+                        <Input
+                          type="file"
                           accept="image/*,.pdf"
                           className="hidden"
                           id="invoice-upload"
                         />
-                        <label 
+                        <label
                           htmlFor="invoice-upload"
                           className="cursor-pointer"
                         >

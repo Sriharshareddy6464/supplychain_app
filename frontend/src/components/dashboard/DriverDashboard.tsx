@@ -127,15 +127,15 @@ function VerificationCard({ currentUser, updateVerification }: { currentUser: an
   );
 }
 
-export function TransporterDashboard() {
+export function DriverDashboard() {
   const navigate = useNavigate();
   const { currentUser, getAvailableRides, getRideByTransporter, getWeeklyStats, updateVerification } = useStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const availableRides = getAvailableRides();
   const myRides = currentUser ? getRideByTransporter(currentUser.id) : [];
-  const activeRide = myRides.find(r => ['accepted', 'picked_up', 'in_transit'].includes(r.status));
-  const completedRides = myRides.filter(r => r.status === 'delivered');
+  const activeRide = myRides.find((r: any) => ['accepted', 'picked_up', 'in_transit'].includes(r.status));
+  const completedRides = myRides.filter((r: any) => r.status === 'delivered');
 
   const weeklyStats = currentUser ? getWeeklyStats(currentUser.id) : { total: 0, count: 0 };
 
@@ -188,7 +188,7 @@ export function TransporterDashboard() {
               />
               <StatCard
                 title="Completed Today"
-                value={completedRides.filter(r => {
+                value={completedRides.filter((r: any) => {
                   const today = new Date();
                   today.setHours(0, 0, 0, 0);
                   return r.deliveredAt && new Date(r.deliveredAt) >= today;
@@ -240,7 +240,7 @@ export function TransporterDashboard() {
                   <div className="mt-4 flex gap-3">
                     <Button
                       className="flex-1"
-                      onClick={() => navigate(`/transporter/delivery/${activeRide.id}`)}
+                      onClick={() => navigate(`/driver/delivery/${activeRide.id}`)}
                     >
                       <Navigation className="w-4 h-4 mr-2" />
                       Track Delivery
@@ -272,7 +272,7 @@ export function TransporterDashboard() {
                   />
                 ) : (
                   <div className="space-y-4">
-                    {availableRides.slice(0, 5).map((ride) => (
+                    {availableRides.slice(0, 5).map((ride: any) => (
                       <div
                         key={ride.id}
                         className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100"
@@ -299,7 +299,7 @@ export function TransporterDashboard() {
                         </div>
                         <Button
                           size="sm"
-                          onClick={() => navigate(`/transporter/ride/${ride.id}`)}
+                          onClick={() => navigate(`/driver/ride/${ride.id}`)}
                         >
                           View Details
                         </Button>
@@ -329,7 +329,7 @@ export function TransporterDashboard() {
                     />
                   ) : (
                     <div className="space-y-4">
-                      {completedRides.slice(0, 5).map((ride) => (
+                      {completedRides.slice(0, 5).map((ride: any) => (
                         <div
                           key={ride.id}
                           className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
@@ -370,7 +370,7 @@ export function TransporterDashboard() {
                     <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
                       <span className="text-gray-600">This Week</span>
                       <span className="font-semibold text-lg text-blue-600">
-                        {completedRides.filter(r => {
+                        {completedRides.filter((r: any) => {
                           const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
                           return r.deliveredAt && new Date(r.deliveredAt) >= weekAgo;
                         }).length}

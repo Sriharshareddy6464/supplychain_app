@@ -9,10 +9,10 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { 
-  ShoppingCart, 
-  Package, 
-  Clock, 
+import {
+  ShoppingCart,
+  Package,
+  Clock,
   CheckCircle,
   Plus,
   Eye,
@@ -31,18 +31,18 @@ export function KitchenDashboard() {
   const weeklyStats = currentUser ? getWeeklyStats(currentUser.id) : { total: 0, count: 0 };
   const monthlyStats = currentUser ? getMonthlyStats(currentUser.id) : { total: 0, count: 0 };
 
-  const pendingOrders = orders.filter(o => ['pending_supplier', 'vendor_assigned', 'packing', 'packed_ready'].includes(o.status));
-  const activeOrders = orders.filter(o => ['pickup_requested', 'in_transit', 'delivered'].includes(o.status));
-  const completedOrders = orders.filter(o => ['kitchen_confirmed', 'completed'].includes(o.status));
+  const pendingOrders = orders.filter((o: any) => ['pending_supplier', 'vendor_assigned', 'packing', 'packed_ready'].includes(o.status));
+  const activeOrders = orders.filter((o: any) => ['pickup_requested', 'in_transit'].includes(o.status));
+  const completedOrders = orders.filter((o: any) => ['kitchen_confirmed', 'completed'].includes(o.status));
 
-  const recentOrders = [...orders].sort((a, b) => 
+  const recentOrders = [...orders].sort((a, b) =>
     b.createdAt.getTime() - a.createdAt.getTime()
   ).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         {/* Desktop Sidebar */}
         <div className="hidden md:block">
@@ -99,14 +99,14 @@ export function KitchenDashboard() {
 
             {/* Quick Actions */}
             <div className="flex flex-wrap gap-3 mb-8">
-              <Button 
+              <Button
                 onClick={() => navigate('/kitchen/new-order')}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create New Order
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => navigate('/kitchen/orders')}
               >
@@ -119,8 +119,8 @@ export function KitchenDashboard() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recent Orders</CardTitle>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => navigate('/kitchen/orders')}
                 >

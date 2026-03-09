@@ -44,23 +44,21 @@ export function VendorDashboard() {
   });
 
   // Get vendor's orders (Fix: rely on vendorId match, not category derivation)
-  const vendorOrders = orders.filter(order =>
-    order.items.some(item => item.vendorId === currentUser?.id)
+  const vendorOrders = orders.filter((order: any) =>
+    order.items.some((item: any) => item.vendorId === currentUser?.id)
   );
 
-  const pendingOrders = vendorOrders.filter(o =>
+  const pendingOrders = vendorOrders.filter((o: any) =>
     o.status === 'vendor_assigned'
   );
 
-  const packingOrders = vendorOrders.filter(o =>
+  const packingOrders = vendorOrders.filter((o: any) =>
     o.status === 'packing'
   );
 
-  const readyOrders = vendorOrders.filter(o =>
-    o.status === 'packed_ready'
+  const readyOrders = vendorOrders.filter((o: any) =>
+    ['packed_ready', 'pickup_requested', 'in_transit', 'delivered', 'completed'].includes(o.status)
   );
-
-
 
   const weeklyStats = currentUser ? getWeeklyStats(currentUser.id) : { total: 0, count: 0 };
 
@@ -98,7 +96,7 @@ export function VendorDashboard() {
   };
 
   const categoryLabel = currentUser?.subRole
-    ? currentUser.subRole.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+    ? currentUser.subRole.replace('_', ' ').replace(/\b\w/g, (l: any) => l.toUpperCase())
     : 'Vendor';
 
   return (
@@ -195,8 +193,8 @@ export function VendorDashboard() {
                           </thead>
                           <tbody>
                             {[...pendingOrders, ...packingOrders].map((order) => {
-                              const myItems = order.items.filter(item => item.vendorId === currentUser?.id);
-                              const myAmount = myItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                              const myItems = order.items.filter((item: any) => item.vendorId === currentUser?.id);
+                              const myAmount = myItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
 
                               return (
                                 <tr key={order.id} className="border-b hover:bg-gray-50">

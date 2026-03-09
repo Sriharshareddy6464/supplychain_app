@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { Truck, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export function Login() {
   const navigate = useNavigate();
-  const { login, currentUser } = useAuthStore();
+  const { login } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -143,19 +143,23 @@ export function Login() {
               <p className="text-xs text-gray-500 text-center mb-2">Demo Credentials</p>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
                 <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">admin@aggregator.com</span>
+                  <span className="font-medium">admin@supplychain.com</span>
                   <br />admin123
                 </div>
                 <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">chef@kitchen.com</span>
-                  <br />chef123
+                  <span className="font-medium">aggregator@supplychain.com</span>
+                  <br />aggregator123
                 </div>
                 <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">vendor@vendor.com</span>
+                  <span className="font-medium">kitchen@supplychain.com</span>
+                  <br />kitchen123
+                </div>
+                <div className="bg-white p-2 rounded border">
+                  <span className="font-medium">vendor@supplychain.com</span>
                   <br />vendor123
                 </div>
-                <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">driver@logistics.com</span>
+                <div className="bg-white p-2 rounded border col-span-2">
+                  <span className="font-medium">driver@supplychain.com</span>
                   <br />driver123
                 </div>
               </div>

@@ -1,5 +1,5 @@
 // User Roles and Sub-roles
-export type UserRole = 'admin' | 'kitchen' | 'supplier' | 'vendor' | 'transporter';
+export type UserRole = 'admin' | 'kitchen' | 'aggregator' | 'vendor' | 'driver';
 
 export type SubRole =
   | 'chef'

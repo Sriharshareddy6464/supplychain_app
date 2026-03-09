@@ -10,9 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Users, 
-  ShoppingCart, 
+import {
+  Users,
+  ShoppingCart,
   TrendingUp,
   CheckCircle,
   Clock,
@@ -27,29 +27,29 @@ export function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Calculate stats
-  const totalUsers = users.filter(u => u.isActive).length;
-  const usersByRole = USER_ROLES.map(role => ({
+  const totalUsers = users.filter((u: any) => u.isActive).length;
+  const usersByRole = USER_ROLES.map((role: any) => ({
     ...role,
-    count: users.filter(u => u.role === role.value && u.isActive).length
+    count: users.filter((u: any) => u.role === role.value && u.isActive).length
   }));
 
   const totalOrders = orders.length;
-  const pendingOrders = orders.filter(o => ['pending_supplier', 'vendor_assigned'].includes(o.status));
-  const activeOrders = orders.filter(o => ['packing', 'packed_ready', 'pickup_requested', 'in_transit'].includes(o.status));
-  const completedOrders = orders.filter(o => ['kitchen_confirmed', 'completed'].includes(o.status));
+  const pendingOrders = orders.filter((o: any) => ['pending_supplier', 'vendor_assigned'].includes(o.status));
+  const activeOrders = orders.filter((o: any) => ['packing', 'packed_ready', 'pickup_requested', 'in_transit'].includes(o.status));
+  const completedOrders = orders.filter((o: any) => ['kitchen_confirmed', 'completed'].includes(o.status));
 
-  const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
-  
-  const openTickets = tickets.filter(t => ['open', 'in_progress'].includes(t.status));
+  const totalRevenue = orders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
 
-  const recentOrders = [...orders].sort((a, b) => 
+  const openTickets = tickets.filter((t: any) => ['open', 'in_progress'].includes(t.status));
+
+  const recentOrders = [...orders].sort((a: any, b: any) =>
     b.createdAt.getTime() - a.createdAt.getTime()
   ).slice(0, 10);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         {/* Desktop Sidebar */}
         <div className="hidden md:block">
@@ -111,8 +111,8 @@ export function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {usersByRole.map((role) => (
-                    <div 
+                  {usersByRole.map((role: any) => (
+                    <div
                       key={role.value}
                       className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 cursor-pointer"
                       onClick={() => navigate(`/admin/users?role=${role.value}`)}
@@ -146,7 +146,7 @@ export function AdminDashboard() {
                   </div>
                   <div className="p-4 bg-red-50 rounded-lg text-center">
                     <p className="text-2xl font-bold text-red-600">
-                      {orders.filter(o => o.status === 'cancelled').length}
+                      {orders.filter((o: any) => o.status === 'cancelled').length}
                     </p>
                     <p className="text-sm text-gray-600 mt-1">Cancelled</p>
                   </div>
@@ -172,8 +172,8 @@ export function AdminDashboard() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Recent Orders</CardTitle>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => navigate('/admin/orders')}
                     >
@@ -194,7 +194,7 @@ export function AdminDashboard() {
                           </tr>
                         </thead>
                         <tbody>
-                          {recentOrders.map((order) => (
+                          {recentOrders.map((order: any) => (
                             <tr key={order.id} className="border-b hover:bg-gray-50">
                               <td className="py-3 px-4 font-medium">{order.orderNumber}</td>
                               <td className="py-3 px-4">{order.kitchenName}</td>
@@ -225,8 +225,8 @@ export function AdminDashboard() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Open Support Tickets</CardTitle>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => navigate('/admin/support')}
                     >
@@ -241,8 +241,8 @@ export function AdminDashboard() {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {openTickets.slice(0, 5).map((ticket) => (
-                          <div 
+                        {openTickets.slice(0, 5).map((ticket: any) => (
+                          <div
                             key={ticket.id}
                             className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
                             onClick={() => navigate(`/admin/support/${ticket.id}`)}
@@ -254,7 +254,7 @@ export function AdminDashboard() {
                                 {formatDistanceToNow(ticket.createdAt)}
                               </p>
                             </div>
-                            <Badge 
+                            <Badge
                               variant={ticket.priority === 'high' ? 'destructive' : 'secondary'}
                             >
                               {ticket.priority}

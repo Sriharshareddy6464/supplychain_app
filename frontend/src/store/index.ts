@@ -1,5 +1,5 @@
 import { useAuthStore } from './authStore';
-import type { Order, Product, Invoice, DeliveryRide, Notification, SupportTicket, User } from '@/types';
+import type { Order, Invoice, DeliveryRide, Notification, SupportTicket, User } from '@/types';
 import { INVENTORY_PRODUCTS } from '@/constants';
 
 // Re-exporting the monolithic useStore hook to not break all Dashboards during the migration.

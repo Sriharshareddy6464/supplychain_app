@@ -11,11 +11,11 @@ export const PRODUCT_CATEGORIES: { value: ProductCategory; label: string; icon: 
 ];
 
 // User Roles with Display Names
-export const USER_ROLES: { value: UserRole; label: string; description: string }[] = [
-  { value: 'kitchen', label: 'Kitchen', description: 'Restaurants and food preparation centers' },
-  { value: 'supplier', label: 'Supplier', description: 'Supply chain coordinators and distributors' },
-  { value: 'vendor', label: 'Vendor', description: 'Product sellers and category specialists' },
-  { value: 'transporter', label: 'Transporter', description: 'Delivery and logistics providers' },
+export const USER_ROLES = [
+  { value: 'AGGREGATOR', label: 'Aggregator', description: 'Supply chain host and coordinator' },
+  { value: 'KITCHEN', label: 'Kitchen', description: 'Restaurant or food prep center' },
+  { value: 'VENDOR', label: 'Vendor', description: 'Wholesaler, retailer or product supplier' },
+  { value: 'DRIVER', label: 'Driver', description: 'Delivery and logistics driver' },
 ];
 
 // Sub-roles mapping
@@ -25,14 +25,14 @@ export const SUB_ROLES: Record<UserRole, { value: SubRole; label: string }[]> = 
     { value: 'chef', label: 'Chef' },
     { value: 'restaurant_manager', label: 'Restaurant Manager' },
   ],
-  supplier: [],
+  aggregator: [],
   vendor: [
     { value: 'veggies_vendor', label: 'Vegetables Vendor' },
     { value: 'fruit_vendor', label: 'Fruit Vendor' },
     { value: 'butcher', label: 'Butcher' },
     { value: 'dairy_vendor', label: 'Dairy Vendor' },
   ],
-  transporter: [
+  driver: [
     { value: 'driver', label: 'Driver' },
     { value: 'delivery_agent', label: 'Delivery Agent' },
   ],

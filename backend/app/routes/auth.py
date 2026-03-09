@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
-
+from app.schemas.user_schema import UserResponse
 from app.database import get_db
 from app.services import auth_service
 from app.schemas.user_schema import Token, UserCreate, UserResponse, LoginResponse
@@ -40,9 +40,9 @@ async def get_current_user_profile(
 ):
     return current_user
 
-@router.post("/register", response_model=UserResponse, dependencies=[Depends(RoleChecker([UserRole.AGGREGATOR]))])
+@router.post("/register", response_model=UserResponse, dependencies=[Depends(RoleChecker([UserRole.ADMIN, UserRole.AGGREGATOR]))])
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     """
-    Only Aggregators can register new users (Vendors, Kitchens, Transporters).
+    Only Admins and Aggregators can register new users.
     """
     return auth_service.create_user(db, user)

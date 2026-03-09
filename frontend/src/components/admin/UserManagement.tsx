@@ -39,7 +39,7 @@ export function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<typeof users[0] | null>(null);
   const [showUserDialog, setShowUserDialog] = useState(false);
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user: any) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -48,8 +48,8 @@ export function UserManagement() {
     return matchesSearch && matchesRole;
   });
 
-  const activeUsers = filteredUsers.filter(u => u.isActive);
-  const pendingVerifications = users.filter(u => u.verificationDetails?.status === 'pending');
+  const activeUsers = filteredUsers.filter((u: any) => u.isActive);
+  const pendingVerifications = users.filter((u: any) => u.verificationDetails?.status === 'pending');
 
   const handleToggleUserStatus = (userId: string, active: boolean) => {
     updateUserById(userId, { isActive: active });
@@ -171,7 +171,7 @@ export function UserManagement() {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {filteredUsers.map((user) => (
+                        {filteredUsers.map((user: any) => (
                           <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">

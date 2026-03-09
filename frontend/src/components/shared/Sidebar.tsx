@@ -3,11 +3,12 @@ import { useStore } from '@/store';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Users, 
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Users,
   HeadphonesIcon,
+  Truck,
   Settings,
   ClipboardList,
   Wallet
@@ -62,6 +63,20 @@ export function Sidebar({ className }: SidebarProps) {
           { path: '/vendor/billing', label: 'Billing', icon: Wallet },
           ...commonItems,
         ];
+      case 'aggregator':
+        return [
+          { path: '/aggregator', label: 'Dashboard', icon: LayoutDashboard },
+          { path: '/aggregator/orders', label: 'Today\'s Orders', icon: ClipboardList },
+          { path: '/aggregator/billing', label: 'Billing', icon: Wallet },
+          ...commonItems,
+        ];
+      case 'driver':
+        return [
+          { path: '/driver', label: 'Dashboard', icon: LayoutDashboard },
+          { path: '/driver/deliveries', label: 'My Deliveries', icon: Truck },
+          { path: '/driver/billing', label: 'Earnings', icon: Wallet },
+          ...commonItems,
+        ];
       case 'transporter':
         return [
           { path: '/transporter', label: 'Dashboard', icon: LayoutDashboard },
@@ -82,7 +97,7 @@ export function Sidebar({ className }: SidebarProps) {
           {menuItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
-            
+
             return (
               <Button
                 key={item.path}

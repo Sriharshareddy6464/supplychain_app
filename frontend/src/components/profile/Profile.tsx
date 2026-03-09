@@ -56,11 +56,10 @@ export function Profile() {
 
   const getBackPath = () => {
     switch (currentUser.role) {
-      case 'admin': return '/admin';
+      case 'aggregator': return '/aggregator';
       case 'kitchen': return '/kitchen';
-      case 'supplier': return '/supplier';
       case 'vendor': return '/vendor';
-      case 'transporter': return '/transporter';
+      case 'driver': return '/driver';
       default: return '/';
     }
   };

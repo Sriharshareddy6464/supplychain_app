@@ -12,10 +12,11 @@ def seed_users():
     db = SessionLocal()
     
     users = [
-        {"full_name": "Aggregator Admin", "email": "admin@aggregator.com",     "password": "admin123",     "role": UserRole.AGGREGATOR},
-        {"full_name": "Head Chef",        "email": "chef@kitchen.com",          "password": "chef123",      "role": UserRole.KITCHEN},
-        {"full_name": "Vendor Manager",   "email": "vendor@vendor.com",         "password": "vendor123",    "role": UserRole.VENDOR},
-        {"full_name": "Driver",           "email": "driver@logistics.com",      "password": "driver123",    "role": UserRole.TRANSPORTER},
+        {"full_name": "System Admin",    "email": "admin@supplychain.com",      "password": "admin123",      "role": UserRole.ADMIN},
+        {"full_name": "Aggregator Host", "email": "aggregator@supplychain.com", "password": "aggregator123", "role": UserRole.AGGREGATOR},
+        {"full_name": "Head Chef",       "email": "kitchen@supplychain.com",    "password": "kitchen123",    "role": UserRole.KITCHEN},
+        {"full_name": "Shop Manager",    "email": "vendor@supplychain.com",     "password": "vendor123",     "role": UserRole.VENDOR},
+        {"full_name": "Driver",          "email": "driver@supplychain.com",     "password": "driver123",     "role": UserRole.DRIVER},
     ]
 
     print("--- SEEDING USERS ---")
@@ -59,7 +60,7 @@ def seed_users():
             # NO contact_phone in vendor.py provided in Step 850.
             # Removing contact_phone.
             db.add(profile)
-        elif u["role"] == UserRole.TRANSPORTER:
+        elif u["role"] == UserRole.DRIVER:
             profile = Transport(
                 user_id=new_user.id,
                 driver_name=u["full_name"],

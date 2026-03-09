@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { 
+import {
   TrendingUp,
   FileText,
   Download,
@@ -20,11 +20,11 @@ import {
 import { CURRENCY } from '@/constants';
 import { formatDistanceToNow } from '@/lib/utils';
 
-interface BillingDashboardProps {
-  role: 'kitchen' | 'supplier' | 'vendor' | 'transporter';
+interface BillingProps {
+  role: 'kitchen' | 'aggregator' | 'vendor' | 'driver';
 }
 
-export function BillingDashboard({ role }: BillingDashboardProps) {
+export function BillingDashboard({ role }: BillingProps) {
   const navigate = useNavigate();
   const { currentUser, getInvoicesByUser, getWeeklyStats, getMonthlyStats } = useStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,13 +33,14 @@ export function BillingDashboard({ role }: BillingDashboardProps) {
   const weeklyStats = currentUser ? getWeeklyStats(currentUser.id) : { total: 0, count: 0 };
   const monthlyStats = currentUser ? getMonthlyStats(currentUser.id) : { total: 0, count: 0 };
 
-  const draftInvoices = invoices.filter(inv => inv.status === 'draft');
-  const sentInvoices = invoices.filter(inv => inv.status === 'sent');
-  const paidInvoices = invoices.filter(inv => inv.status === 'paid');
+  const pendingInvoices = invoices.filter((inv: any) => inv.status === 'pending');
+  const paidInvoices = invoices.filter((inv: any) => inv.status === 'paid');
+  const overdueInvoices = invoices.filter((inv: any) => inv.status === 'overdue');
 
-  const totalOutstanding = draftInvoices.reduce((sum, inv) => sum + inv.total, 0);
-  const totalPaid = paidInvoices.reduce((sum, inv) => sum + inv.total, 0);
-  
+  const totalOutstanding = pendingInvoices.reduce((sum: number, inv: any) => sum + inv.amount, 0) +
+    overdueInvoices.reduce((sum: number, inv: any) => sum + inv.amount, 0);
+  const totalPaid = paidInvoices.reduce((sum: number, inv: any) => sum + (inv.total || inv.amount || 0), 0);
+
   // Use role and navigate to avoid unused variable warnings
   void role;
   void navigate;
@@ -47,7 +48,7 @@ export function BillingDashboard({ role }: BillingDashboardProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      
+
       <div className="flex">
         <div className="hidden md:block">
           <Sidebar />
@@ -83,7 +84,7 @@ export function BillingDashboard({ role }: BillingDashboardProps) {
                 title="Outstanding"
                 value={`${CURRENCY}${totalOutstanding.toLocaleString()}`}
                 icon={AlertCircle}
-                description="Draft invoices"
+                description="Pending & Overdue"
               />
               <StatCard
                 title="Monthly Total"
@@ -138,13 +139,13 @@ export function BillingDashboard({ role }: BillingDashboardProps) {
                   All
                   <Badge variant="secondary" className="ml-2">{invoices.length}</Badge>
                 </TabsTrigger>
-                <TabsTrigger value="draft">
-                  Draft
-                  <Badge variant="secondary" className="ml-2">{draftInvoices.length}</Badge>
+                <TabsTrigger value="pending">
+                  Pending
+                  <Badge variant="secondary" className="ml-2">{pendingInvoices.length}</Badge>
                 </TabsTrigger>
-                <TabsTrigger value="sent">
-                  Sent
-                  <Badge variant="secondary" className="ml-2">{sentInvoices.length}</Badge>
+                <TabsTrigger value="overdue">
+                  Overdue
+                  <Badge variant="secondary" className="ml-2">{overdueInvoices.length}</Badge>
                 </TabsTrigger>
                 <TabsTrigger value="paid">
                   Paid
@@ -152,7 +153,7 @@ export function BillingDashboard({ role }: BillingDashboardProps) {
                 </TabsTrigger>
               </TabsList>
 
-              {['all', 'draft', 'sent', 'paid'].map((tab) => (
+              {['all', 'pending', 'overdue', 'paid'].map((tab) => (
                 <TabsContent key={tab} value={tab}>
                   <Card>
                     <CardHeader>
@@ -160,10 +161,10 @@ export function BillingDashboard({ role }: BillingDashboardProps) {
                     </CardHeader>
                     <CardContent>
                       {(() => {
-                        const tabInvoices = tab === 'all' 
-                          ? invoices 
-                          : invoices.filter(inv => inv.status === tab);
-                        
+                        const tabInvoices = tab === 'all'
+                          ? invoices
+                          : invoices.filter((inv: any) => inv.status === tab);
+
                         if (tabInvoices.length === 0) {
                           return (
                             <div className="text-center py-8 text-gray-500">
@@ -188,9 +189,9 @@ export function BillingDashboard({ role }: BillingDashboardProps) {
                                 </tr>
                               </thead>
                               <tbody>
-                                {tabInvoices.sort((a, b) => 
+                                {tabInvoices.sort((a: any, b: any) =>
                                   b.createdAt.getTime() - a.createdAt.getTime()
-                                ).map((invoice) => (
+                                ).map((invoice: any) => (
                                   <tr key={invoice.id} className="border-b hover:bg-gray-50">
                                     <td className="py-3 px-4 font-medium">{invoice.invoiceNumber}</td>
                                     <td className="py-3 px-4 text-sm text-gray-600">
@@ -203,9 +204,9 @@ export function BillingDashboard({ role }: BillingDashboardProps) {
                                       {CURRENCY}{invoice.total.toLocaleString()}
                                     </td>
                                     <td className="py-3 px-4">
-                                      <Badge 
-                                        variant={invoice.status === 'paid' ? 'default' : 
-                                                 invoice.status === 'sent' ? 'secondary' : 'outline'}
+                                      <Badge
+                                        variant={invoice.status === 'paid' ? 'default' :
+                                          invoice.status === 'sent' ? 'secondary' : 'outline'}
                                         className={invoice.status === 'paid' ? 'bg-green-100 text-green-700' : ''}
                                       >
                                         {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}

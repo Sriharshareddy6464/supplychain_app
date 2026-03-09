@@ -5,10 +5,11 @@ import enum
 from app.database import Base
 
 class UserRole(str, enum.Enum):
+    ADMIN = "ADMIN"
     AGGREGATOR = "AGGREGATOR"
     KITCHEN = "KITCHEN"
     VENDOR = "VENDOR"
-    TRANSPORTER = "TRANSPORTER"
+    DRIVER = "DRIVER"
 
 class User(Base):
     __tablename__ = "users"

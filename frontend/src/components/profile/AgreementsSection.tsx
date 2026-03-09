@@ -46,7 +46,7 @@ export function AgreementsSection() {
 
     // Get details of agreed users
     const allUsers = getAllUsers();
-    const agreedUsers = allUsers.filter(u => currentUser.agreements?.includes(u.id));
+    const agreedUsers = allUsers.filter((u: any) => currentUser.agreements?.includes(u.id));
 
     return (
         <div className="space-y-6">
@@ -158,7 +158,7 @@ export function AgreementsSection() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {agreedUsers.map(user => (
+                            {agreedUsers.map((user: any) => (
                                 <div key={user.id} className="p-4 border rounded-lg flex justify-between items-start bg-white shadow-sm">
                                     <div>
                                         <h4 className="font-semibold">{user.name}</h4>
