@@ -1,51 +1,75 @@
-login: async (email: string, password: string) => {
-  try {
-    const formData = new URLSearchParams();
-    formData.append('username', email);
-    formData.append('password', password);
+import { useAuthStore } from './authStore';
+import type { Order, Product, Invoice, DeliveryRide, Notification, SupportTicket, User } from '@/types';
+import { INVENTORY_PRODUCTS } from '@/constants';
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const response = await fetch(`${apiUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formData.toString()
-    });
+// Re-exporting the monolithic useStore hook to not break all Dashboards during the migration.
+// This hooks purely delegates authentication to the real `useAuthStore` backend integration 
+// and fills the remaining features with safe empty arrays so Vite compiles successfully.
 
-    if (!response.ok) {
-      const err = await response.json();
-      return { success: false, message: err.detail || 'Invalid email or password' };
-    }
+export const useStore = () => {
+  const authStore = useAuthStore();
 
-    const data = await response.json(); // get token from backend
+  return {
+    ...authStore,
 
-    // Fetch user profile using token
-    const profileRes = await fetch(`${apiUrl}/auth/me`, {
-      headers: { 'Authorization': `Bearer ${data.access_token}` }
-    });
+    // Order State
+    orders: [] as Order[],
+    currentOrder: null as Order | null,
+    createOrder: () => ({}),
+    updateOrderStatus: () => { },
+    assignSupplier: () => { },
+    assignVendor: () => { },
+    assignTransporter: () => { },
+    getOrdersByKitchen: () => [],
+    getOrdersBySupplier: () => [],
+    getOrdersByVendor: () => [],
+    getOrdersByTransporter: () => [],
+    getOrderById: () => undefined,
+    getTodaysOrders: () => [],
 
-    if (!profileRes.ok) {
-      return { success: false, message: 'Could not fetch user profile' };
-    }
+    // Inventory State
+    products: INVENTORY_PRODUCTS,
+    getProductsByCategory: () => [],
+    getProductById: () => undefined,
 
-    const userData = await profileRes.json();
+    // Invoice State
+    invoices: [] as Invoice[],
+    createInvoice: () => ({}),
+    getInvoicesByUser: () => [],
+    getWeeklyStats: () => ({ total: 0, count: 0 }),
+    getMonthlyStats: () => ({ total: 0, count: 0 }),
 
-    const user: User = {
-      id: String(userData.id),
-      uniqueId: String(userData.id),
-      email: userData.email,
-      name: userData.full_name || userData.email,
-      role: userData.role.toLowerCase() as UserRole,
-      isActive: userData.is_active,
-      agreements: [],
-      createdAt: new Date(userData.created_at),
-      updatedAt: new Date(userData.created_at),
-    };
+    // Delivery State
+    rides: [] as DeliveryRide[],
+    createRide: () => ({}),
+    acceptRide: () => { },
+    updateRideStatus: () => { },
+    updateLocation: () => { },
+    getAvailableRides: () => [],
+    getRideByTransporter: () => [],
 
-    set({ currentUser: user, isAuthenticated: true });
-    return { success: true, message: 'Login successful!' };
+    // Notification State
+    notifications: [] as Notification[],
+    addNotification: () => { },
+    markAsRead: () => { },
+    markAllAsRead: () => { },
+    getNotificationsByUser: () => [],
+    getUnreadCount: () => 0,
 
-  } catch (error) {
-    console.error('Backend connection error:', error);
-    return { success: false, message: 'Could not connect to backend API' };
-  }
-},
+    // Support State
+    tickets: [] as SupportTicket[],
+    createTicket: () => ({}),
+    addResponse: () => { },
+    updateTicketStatus: () => { },
+    getTicketsByUser: () => [],
+    getAllTickets: () => [],
+
+    // Admin State
+    users: [] as User[],
+    addUser: () => { },
+    updateUserById: () => { },
+    deleteUser: () => { },
+    getUsersByRole: () => [],
+    getAllUsers: () => [],
+  } as any;
+};

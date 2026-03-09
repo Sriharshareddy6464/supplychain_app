@@ -12,51 +12,10 @@ def seed_users():
     db = SessionLocal()
     
     users = [
-        # 1. Aggregator
-        {
-            "email": "supplier@aggregator.com",
-            "full_name": "Supplier Admin",
-            "role": UserRole.AGGREGATOR,
-            "password": "supplier123"
-        },
-        # 2. Kitchen
-        {
-            "email": "headchef@cloudkitchen.com",
-            "full_name": "Head Chef",
-            "role": UserRole.KITCHEN,
-            "business_name": "The Cloud Kitchen",
-            "password": "chef123"
-        },
-        # 3. Vendors
-        {
-            "email": "kuragailaraju@vendor.com",
-            "full_name": "Raju Veggies",
-            "role": UserRole.VENDOR,
-            "business_name": "Raju's Farm Fresh",
-            "password": "vendor123"
-        },
-        {
-            "email": "butcher@vendor.com",
-            "full_name": "Bob The Butcher",
-            "role": UserRole.VENDOR,
-            "business_name": "Premium Meats Inc",
-            "password": "vendor123"
-        },
-        {
-            "email": "dairyproducts@vendor.com",
-            "full_name": "Daisy Dairy",
-            "role": UserRole.VENDOR,
-            "business_name": "Milky Way",
-            "password": "vendor123"
-        },
-        # 4. Transporter
-        {
-            "email": "driver@logistics.com",
-            "full_name": "Fast Eddie",
-            "role": UserRole.TRANSPORTER,
-            "vehicle_number": "KA-01-AB-1234",
-            "password": "driver123"
-        }
+        {"full_name": "Aggregator Admin", "email": "admin@aggregator.com",     "password": "admin123",     "role": UserRole.AGGREGATOR},
+        {"full_name": "Head Chef",        "email": "chef@kitchen.com",          "password": "chef123",      "role": UserRole.KITCHEN},
+        {"full_name": "Vendor Manager",   "email": "vendor@vendor.com",         "password": "vendor123",    "role": UserRole.VENDOR},
+        {"full_name": "Driver",           "email": "driver@logistics.com",      "password": "driver123",    "role": UserRole.TRANSPORTER},
     ]
 
     print("--- SEEDING USERS ---")

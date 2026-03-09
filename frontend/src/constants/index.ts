@@ -57,7 +57,7 @@ export const INVENTORY_PRODUCTS: Product[] = [
   { id: 'f4', name: 'Mango', category: 'fruits', unit: 'kg', basePrice: 200, description: 'Sweet mangoes', isActive: true },
   { id: 'f5', name: 'Grapes', category: 'fruits', unit: 'kg', basePrice: 180, description: 'Fresh grapes', isActive: true },
   { id: 'f6', name: 'Watermelon', category: 'fruits', unit: 'piece', basePrice: 150, description: 'Sweet watermelon', isActive: true },
-  
+
   // Vegetables
   { id: 'v1', name: 'Tomato', category: 'vegetables', unit: 'kg', basePrice: 40, description: 'Fresh tomatoes', isActive: true },
   { id: 'v2', name: 'Onion', category: 'vegetables', unit: 'kg', basePrice: 35, description: 'Red onions', isActive: true },
@@ -67,14 +67,14 @@ export const INVENTORY_PRODUCTS: Product[] = [
   { id: 'v6', name: 'Cauliflower', category: 'vegetables', unit: 'piece', basePrice: 35, description: 'Fresh cauliflower', isActive: true },
   { id: 'v7', name: 'Spinach', category: 'vegetables', unit: 'bunch', basePrice: 20, description: 'Fresh spinach', isActive: true },
   { id: 'v8', name: 'Bell Pepper', category: 'vegetables', unit: 'kg', basePrice: 80, description: 'Colorful bell peppers', isActive: true },
-  
+
   // Meat
   { id: 'm1', name: 'Chicken Breast', category: 'meat', unit: 'kg', basePrice: 280, description: 'Boneless chicken breast', isActive: true },
   { id: 'm2', name: 'Chicken Whole', category: 'meat', unit: 'kg', basePrice: 220, description: 'Whole chicken', isActive: true },
   { id: 'm3', name: 'Mutton', category: 'meat', unit: 'kg', basePrice: 650, description: 'Fresh mutton', isActive: true },
   { id: 'm4', name: 'Fish', category: 'meat', unit: 'kg', basePrice: 350, description: 'Fresh fish', isActive: true },
   { id: 'm5', name: 'Eggs', category: 'meat', unit: 'dozen', basePrice: 90, description: 'Fresh eggs', isActive: true },
-  
+
   // Dairy
   { id: 'd1', name: 'Milk', category: 'dairy', unit: 'liter', basePrice: 60, description: 'Fresh milk', isActive: true },
   { id: 'd2', name: 'Butter', category: 'dairy', unit: '500g', basePrice: 250, description: 'Creamy butter', isActive: true },
@@ -82,12 +82,12 @@ export const INVENTORY_PRODUCTS: Product[] = [
   { id: 'd4', name: 'Yogurt', category: 'dairy', unit: '500g', basePrice: 70, description: 'Fresh yogurt', isActive: true },
   { id: 'd5', name: 'Cream', category: 'dairy', unit: '250ml', basePrice: 120, description: 'Fresh cream', isActive: true },
   { id: 'd6', name: 'Paneer', category: 'dairy', unit: '200g', basePrice: 150, description: 'Fresh paneer', isActive: true },
-  
+
   // Grains
   { id: 'g1', name: 'Rice', category: 'grains', unit: 'kg', basePrice: 80, description: 'Basmati rice', isActive: true },
   { id: 'g2', name: 'Wheat Flour', category: 'grains', unit: 'kg', basePrice: 45, description: 'Whole wheat flour', isActive: true },
   { id: 'g3', name: 'Lentils', category: 'grains', unit: 'kg', basePrice: 120, description: 'Mixed lentils', isActive: true },
-  
+
   // Spices
   { id: 's1', name: 'Turmeric', category: 'spices', unit: '100g', basePrice: 35, description: 'Turmeric powder', isActive: true },
   { id: 's2', name: 'Cumin', category: 'spices', unit: '100g', basePrice: 45, description: 'Cumin seeds', isActive: true },
@@ -117,11 +117,4 @@ export const TAX_RATE = 0.18; // 18% GST
 // Currency
 export const CURRENCY = '₹';
 
-// Demo Users for Testing
-export const DEMO_USERS = [
-  { email: 'admin@supplychain.com', password: 'admin123', role: 'admin' as UserRole, name: 'Admin User' },
-  { email: 'kitchen@supplychain.com', password: 'kitchen123', role: 'kitchen' as UserRole, name: 'Kitchen Manager', subRole: 'restaurant_manager' },
-  { email: 'supplier@supplychain.com', password: 'supplier123', role: 'supplier' as UserRole, name: 'Supplier Manager' },
-  { email: 'vendor@supplychain.com', password: 'vendor123', role: 'vendor' as UserRole, name: 'Vendor Manager', subRole: 'veggies_vendor' },
-  { email: 'transporter@supplychain.com', password: 'transporter123', role: 'transporter' as UserRole, name: 'Driver', subRole: 'driver' },
-];
+// Removed DEMO_USERS per the backend unification requirements.

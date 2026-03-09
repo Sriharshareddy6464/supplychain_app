@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useStore } from '@/store';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +10,7 @@ import { Truck, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export function Login() {
   const navigate = useNavigate();
-  const { login } = useStore();
+  const { login, currentUser } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,27 +26,15 @@ export function Login() {
       const result = await login(email, password);
 
       if (result.success) {
-        const { currentUser } = useStore.getState();
-
-        // Redirect based on role
-        switch (currentUser?.role) {
-          case 'admin':
-            navigate('/admin');
-            break;
-          case 'kitchen':
-            navigate('/kitchen');
-            break;
-          case 'supplier':
-            navigate('/supplier');
-            break;
-          case 'vendor':
-            navigate('/vendor');
-            break;
-          case 'transporter':
-            navigate('/transporter');
-            break;
-          default:
-            navigate('/');
+        // Wait for state to update, or just use the current user assuming loginApi returned and set it
+        // The role-based redirect is handled by App.tsx ProtectedRoute or we can do it here:
+        const role = useAuthStore.getState().currentUser?.role?.toLowerCase() || 'aggregator';
+        switch (role) {
+          case 'aggregator': navigate('/admin'); break;
+          case 'kitchen': navigate('/kitchen'); break;
+          case 'vendor': navigate('/vendor'); break;
+          case 'transporter': navigate('/transporter'); break;
+          default: navigate('/');
         }
       } else {
         setError(result.message);
@@ -155,15 +143,15 @@ export function Login() {
               <p className="text-xs text-gray-500 text-center mb-2">Demo Credentials</p>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
                 <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">supplier@aggregator.com</span>
-                  <br />supplier123
+                  <span className="font-medium">admin@aggregator.com</span>
+                  <br />admin123
                 </div>
                 <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">headchef@cloudkitchen.com</span>
+                  <span className="font-medium">chef@kitchen.com</span>
                   <br />chef123
                 </div>
                 <div className="bg-white p-2 rounded border">
-                  <span className="font-medium">kuragailaraju@vendor.com</span>
+                  <span className="font-medium">vendor@vendor.com</span>
                   <br />vendor123
                 </div>
                 <div className="bg-white p-2 rounded border">

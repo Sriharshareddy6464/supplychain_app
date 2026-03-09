@@ -3,7 +3,6 @@ from typing import Optional
 from datetime import datetime
 from app.models.user import UserRole
 
-# Token Schemas
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -12,7 +11,6 @@ class TokenData(BaseModel):
     email: Optional[str] = None
     role: Optional[UserRole] = None
 
-# User Schemas
 class UserBase(BaseModel):
     email: EmailStr
     full_name: str
@@ -25,6 +23,10 @@ class UserResponse(UserBase):
     id: int
     is_active: bool
     created_at: datetime
-
     class Config:
         from_attributes = True
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserResponse

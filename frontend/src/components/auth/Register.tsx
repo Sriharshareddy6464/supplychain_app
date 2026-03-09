@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useStore } from '@/store';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,7 @@ import type { UserRole } from '@/types';
 
 export function Register() {
   const navigate = useNavigate();
-  const { register } = useStore();
+  const { register } = useAuthStore();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -101,7 +101,7 @@ export function Register() {
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
-        role: formData.role as UserRole,
+        role: formData.role.toUpperCase(), // backend expects uppercase role strings
         subRole: (formData.subRole as any) || undefined,
         businessName: formData.businessName,
         address: {
@@ -170,8 +170,8 @@ export function Register() {
                 {[1, 2, 3].map((s) => (
                   <div
                     key={s}
-                    className={`w-8 h-1 rounded-full ${s === step ? 'bg-blue-600' : s < step ? 'bg-blue-300' : 'bg-gray-200'
-                      }`}
+                    className={`w - 8 h - 1 rounded - full ${s === step ? 'bg-blue-600' : s < step ? 'bg-blue-300' : 'bg-gray-200'
+                      } `}
                   />
                 ))}
               </div>
