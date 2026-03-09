@@ -1,0 +1,18 @@
+# Git
+.git
+.gitignore
+
+# Environments
+.env*
+venv/
+__pycache__/
+*.pyc
+
+# IDEs
+.idea/
+.vscode/
+
+# Logs & Temp
+logs/
+*.log
+migrations/versions/__pycache__/
